@@ -1,0 +1,36 @@
+---
+title: "t.test vs wilcox.test"
+output: pdf_document
+---
+
+```{r}
+get_rate <- function(sampler,offset,n,test=t.test){
+  r <- c()
+    for(j in c(1:length(offset))){
+      m<-c()
+      for(i in c(1:n)){
+      x<-sampler()
+      y<-sampler()+offset[j]
+      m[i] <- test(x,y)$p.value < 0.05
+    }
+    r[j] <- mean(m)
+  }
+  r
+}
+curve(dnorm(x),-2,2)
+curve(get_rate(function() rnorm(30),x,10000),0,2)
+curve(get_rate(function() rnorm(30),x,10000,wilcox.test),0,2,add=T,col='blue')
+
+curve(dgamma(x,2,2),0,10)
+curve(get_rate(function() rgamma(30,2,2),x,10000),0,2)
+curve(get_rate(function() rgamma(30,2,2),x,10000,wilcox.test),0,2,add=T,col='blue')
+
+curve(dgamma(x,9,2),0,10)
+curve(get_rate(function() rgamma(30,9,2),x,10000),0,2)
+curve(get_rate(function() rgamma(30,9,2),x,10000,wilcox.test),0,2,add=T,col='blue')
+
+curve(dt(x,1),-2,2)
+curve(get_rate(function() rt(30,1),x,10000,wilcox.test),0,8,col='blue')
+curve(get_rate(function() rt(30,1),x,10000),0,8,add=T)
+
+```
